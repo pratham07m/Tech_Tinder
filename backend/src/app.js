@@ -1,12 +1,28 @@
 const express = require("express");
-const connectDB = require("./config/database.js")
+const connectDB = require("./config/database.js");
 const app = express();
 const cookieParser = require("cookie-parser"); //user for reading cookies
+const cors = require("cors");
+
+// const corsOptions = {
+//   origin: 'http://localhost:5173',
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], 
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+// };
+
+// // Use the cors middleware with your options
+// app.use(cors(corsOptions));
+// app.options('*', cors(corsOptions));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true
+  })
+);
 
 app.use(express.json()); // middelware for json data
 // app.use(express.urlencoded);
-app.use(cookieParser()); //use for reading cookies 
-
+app.use(cookieParser()); //use for reading cookies
 
 const authRouter = require("./routes/auth.js");
 
@@ -16,26 +32,24 @@ const requestRouter = require("./routes/request.js");
 
 const userRouter = require("./routes/user.js");
 
-app.use("/" , authRouter);
-app.use("/" , profileRouter);
-app.use("/" , requestRouter);
-app.use("/" , userRouter);
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+app.use("/", userRouter);
 
-
-
-
-connectDB().then(() => {
+connectDB()
+  .then(() => {
     console.log("DB connect");
 
-    app.listen(3000, () => {
-        console.log("server startd");
+    app.listen(7777, () => {
+      console.log("server startd");
     });
-})
-    .catch((err) => {
-        console.log("DB connection error");
-    });
+  })
+  .catch((err) => {
+    console.log("DB connection error");
+  });
 
- // onother way to handel apis but it not sutabel for big project
+// onother way to handel apis but it not sutabel for big project
 //save user from database (signUp)
 // app.post("/signup", async (req, res) => {
 
@@ -47,13 +61,10 @@ connectDB().then(() => {
 //         //Encrypt the password
 //         const passwordHase = await bcrypt.hash(password, 10)
 
-
-
 //         //creating a new instance of user model
 //         const user = new User({
 //             firstName, lastName, emailId, password: passwordHase
 //         });
-
 
 //         await user.save();
 //         res.send("User Added successfully");
@@ -61,7 +72,6 @@ connectDB().then(() => {
 //         res.status(400).send("Error saving the user" + err.message);
 //     }
 // });
-
 
 // //login
 // app.post("/login", async (req, res) => {
@@ -80,7 +90,6 @@ connectDB().then(() => {
 
 //             //Create a JWT Token
 //             const token = await user.getJWT(); //token creation in models/user.js
-         
 
 //             //Add the token to cookie and send the response back to the user
 //             res.cookie("token", token, {
@@ -98,7 +107,6 @@ connectDB().then(() => {
 //     }
 // });
 
-
 // //get user profile
 // app.get("/profile", userAuth, async (req, res) => {
 //     try {
@@ -111,7 +119,6 @@ connectDB().then(() => {
 //     }
 // });
 
-
 // //get all user from database
 // app.get("/feed", async (req, res) => {
 //     try {
@@ -121,7 +128,6 @@ connectDB().then(() => {
 //         res.status(400).send("Something went wrong");
 //     }
 // });
-
 
 // //get user by emailId
 // app.get("/user", async (req, res) => {
@@ -134,7 +140,6 @@ connectDB().then(() => {
 //     }
 // });
 
-
 // //delet user by ID
 // app.delete("/user", async (req, res) => {
 //     const userId = req.body.userId
@@ -145,7 +150,6 @@ connectDB().then(() => {
 //         res.status(400).send("something went wrong");
 //     }
 // });
-
 
 // //update data of the user
 // app.patch("/user/:userId", async (req, res) => {
@@ -161,7 +165,7 @@ connectDB().then(() => {
 //             throw new Error("update not allowed");
 //         }
 //         const user = await User.findByIdAndUpdate({ _id: userId }, data, {
-//             returnDocument: "after", //gave data after update 
+//             returnDocument: "after", //gave data after update
 //             runValidators: true,//use for validating data
 //         });
 //         res.send("user updated successfully");
@@ -170,9 +174,7 @@ connectDB().then(() => {
 //     }
 // });
 
-
 // const { adminAuth } = require("./middlewares/auth.js")
-
 
 // //midlleware
 

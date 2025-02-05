@@ -21,9 +21,17 @@ authRouter.post("/signup", async (req, res) => {
         const user = new User({
             firstName, lastName, emailId, password: passwordHase
         });
+        
+       const savedUser =  await user.save();
 
-        await user.save();
-        res.send("User Added successfully");
+       const token = await savedUser.getJWT(); //token creation in models/user.js
+
+            //Add the token to cookie and send the response back to the user
+            res.cookie("token", token, {
+                expires: new Date(Date.now() + 8 * 3600000),
+            });
+            
+        res.json({message:"User Added successfully" , data : savedUser});
 
     } catch (err) {
         res.status(400).send("Error saving the user" + err.message);
@@ -40,7 +48,8 @@ authRouter.post("/login", async (req, res) => {
 
         if (!user) {
             // throw new Error("emailId not present");
-            res.send("user not found");
+            res.status(404).send("user not found");
+            return;
         }
 
         const isPasswordValid = await user.validatePassword(password) //function call from model/user.js
@@ -54,10 +63,10 @@ authRouter.post("/login", async (req, res) => {
                 expires: new Date(Date.now() + 8 * 3600000),
             });
 
-            res.send("Login successfull");
+            res.send(user);
         }
         else {
-            res.send("password is not valid")
+            res.status(400).send("password is not valid")
         }
 
     } catch (err) {
